@@ -4,12 +4,14 @@ import {Colors, getFirstString, validBase64, validURL} from '../../../commons';
 import {randomColor} from '../../../commons/randomColor';
 import {Content, Touchable, Text} from '../../../components';
 import Divider from '../../../components/Divider';
+import {GET_START_CONTACT_DETAIL} from '../../../redux/types';
 import {styles} from '../style';
 
-const Contact = ({data, navigation, loading}) => {
-  function onPressItem(item, color) {
+const Contact = ({data, navigation, loading, dispatch}) => {
+  function onPressItem(id, color) {
+    dispatch({type: GET_START_CONTACT_DETAIL});
     navigation.navigate('ContactDetail', {
-      id: item.id.replace(/\"/g, ''),
+      id: id,
       color: color,
     });
   }
@@ -31,7 +33,7 @@ const Contact = ({data, navigation, loading}) => {
             <Touchable
               color={Colors.ripple_black}
               style={styles.buttonItem}
-              onPress={() => onPressItem(item, randomColor[index])}>
+              onPress={() => onPressItem(item.id, randomColor[index])}>
               <Content paddingVertical={12} row centerTop>
                 {validUrls || validBase === 'data:image' ? (
                   <Image

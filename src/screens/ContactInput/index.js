@@ -16,7 +16,8 @@ import * as yup from 'yup';
 import {ScrollView} from 'react-native';
 import {launchImageLibrary} from 'react-native-image-picker';
 import {useDispatch, useSelector} from 'react-redux';
-import {POST_CONTACT} from '../../redux/actions';
+import {POST_CONTACT, UPDATE_CONTACT} from '../../redux/actions';
+import {POST_START_CONTACT, UPDATE_START_CONTACT} from '../../redux/types';
 
 const ContactInput = ({navigation, route}) => {
   const {data} = route.params;
@@ -69,26 +70,30 @@ const ContactInput = ({navigation, route}) => {
   });
 
   function onSubmit(value) {
+    dispatch({type: POST_START_CONTACT});
     const body = {
       firstName: value.firstName,
       lastName: value.lastName,
       age: Number(value.age),
-      photo: file,
+      photo: file.uri,
     };
-    dispatch(
-      POST_CONTACT(
-        body,
-        reset,
-        setVisible,
-        setFile,
-        setValue('photo', ''),
-        {
-          update: data ? true : false,
-        },
-        data ? data.id : '',
-        navigation,
-      ),
-    );
+    if (data) {
+      dispatch(
+        UPDATE_CONTACT(
+          body,
+          reset,
+          setVisible,
+          setFile,
+          data.id,
+          setValue('photo', ''),
+          navigation,
+        ),
+      );
+    } else {
+      dispatch(
+        POST_CONTACT(body, reset, setVisible, setFile, setValue('photo', '')),
+      );
+    }
   }
 
   const Gallery = React.useCallback(() => {
@@ -99,6 +104,8 @@ const ContactInput = ({navigation, route}) => {
           console.log('Error Code');
         } else if (response?.didCancel) {
           console.log('close gallery');
+        } else if (response?.errorMessage) {
+          console.log('error', response?.errorMessage);
         } else {
           const fileName = 'IMAGE_' + new Date().getTime() + '.jpg';
           setFile({
@@ -208,7 +215,7 @@ const ContactInput = ({navigation, route}) => {
                 error={errors.photo}
                 photoName={file.name}
                 onPressUpload={() => Gallery()}
-                onPressClear={() =>
+                onPressClear={() => {
                   reset(
                     {
                       firstName: getValues('firstName'),
@@ -217,8 +224,9 @@ const ContactInput = ({navigation, route}) => {
                       photo: '',
                     },
                     {keepErrors: true},
-                  )
-                }
+                  );
+                  setFile({});
+                }}
               />
             </Content>
           </ScrollView>
@@ -234,8 +242,8 @@ const ContactInput = ({navigation, route}) => {
       </Content>
       <Alert
         title={error ? 'Error' : data ? 'Update' : 'Input'}
-        success={!error}
-        alert={error}
+        success={error ? false : data ? true : true}
+        alert={error ? true : false}
         message={
           error
             ? message

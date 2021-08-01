@@ -135,8 +135,8 @@ const ContactDetail = ({navigation, route}) => {
       </Content>
       <Alert
         title={error ? 'Error' : 'Success'}
-        success={!error}
-        alert={error}
+        success={error ? false : true}
+        alert={error ? true : false}
         big
         message={error ? message : 'Delete Contact Success'}
         visible={visible}

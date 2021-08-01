@@ -6,7 +6,6 @@ import {
   GET_ERROR_CONTACT,
   ADD_ALERT,
   REMOVE_ALERT,
-  POST_START_CONTACT,
   POST_SUCCESS_CONTACT,
   POST_ERROR_CONTACT,
   GET_START_CONTACT_DETAIL,
@@ -15,6 +14,8 @@ import {
   DELETE_START_CONTACT,
   DELETE_SUCCESS_CONTACT,
   DELETE_ERROR_CONTACT,
+  UPDATE_SUCCESS_CONTACT,
+  UPDATE_ERROR_CONTACT,
 } from '../types';
 axios.defaults.baseURL = 'https://simple-contact-crud.herokuapp.com';
 
@@ -53,30 +54,16 @@ export const GET_CONTACT_DETAIL = (id, setVisible) => async dispatch => {
 };
 
 export const POST_CONTACT =
-  (data, reset, setVisible, setFile, setValue, update, id, navigation) =>
-  async dispatch => {
-    dispatch({type: POST_START_CONTACT});
+  (body, reset, setVisible, setFile, setValue) => async dispatch => {
     try {
-      const body = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        age: data.age,
-        photo: data.photo.uri,
-      };
-      const res = update.update
-        ? await axios.put(`/contact/${id}`, body, {timeout: 8000})
-        : await axios.post(`/contact`, body, {timeout: 8000});
+      const res = await axios.post(`/contact`, body, {timeout: 8000});
+      await dispatch({type: POST_SUCCESS_CONTACT});
+      await dispatch(GET_CONTACT(setVisible));
       if (res.status === 201) {
-        dispatch(GET_CONTACT());
-        if (!update.update) {
-          reset({});
-        }
+        reset({});
         setVisible(true);
         wait(2000).then(() => {
           setVisible(false);
-          if (update.update) {
-            navigation.goBack();
-          }
         });
         setFile({});
         setValue;
@@ -85,35 +72,31 @@ export const POST_CONTACT =
       if (error.code === 'ECONNABORTED') {
         dispatch(addAlertTimeout());
       }
-      dispatch({type: POST_ERROR_CONTACT, message: error.message});
-      setVisible(true);
-      wait(2000).then(() => {
-        setVisible(false);
-      });
+      if (error) {
+        dispatch({type: POST_ERROR_CONTACT, message: error.message});
+        setVisible(true);
+        wait(2000).then(() => {
+          setVisible(false);
+        });
+      }
     } finally {
       dispatch({type: POST_SUCCESS_CONTACT});
-      if (update.update) {
-        dispatch(GET_CONTACT_DETAIL(id));
-      }
     }
   };
 
 export const UPDATE_CONTACT =
-  (data, reset, setVisible, setFile, setValue) => async dispatch => {
-    dispatch({type: UPDATE_START_CONTACT});
+  (body, reset, setVisible, setFile, id, setValue, navigation) =>
+  async dispatch => {
     try {
-      const body = {
-        firstName: data.firstName,
-        lastName: data.lastName,
-        age: data.age,
-        photo: data.photo.uri,
-      };
-      const res = await axios.post(`/contact`, body, {timeout: 8000});
+      const res = await axios.put(`/contact/${id}`, body, {timeout: 8000});
       if (res.status === 201) {
-        dispatch(GET_CONTACT());
+        dispatch(GET_CONTACT_DETAIL(id, setVisible));
         reset({});
         setVisible(true);
-        wait(2000).then(() => setVisible(false));
+        wait(2000).then(() => {
+          setVisible(false);
+          navigation.goBack();
+        });
         setFile({});
         setValue;
       }
@@ -121,13 +104,13 @@ export const UPDATE_CONTACT =
       if (error.code === 'ECONNABORTED') {
         dispatch(addAlertTimeout());
       }
-      dispatch({type: POST_ERROR_CONTACT, message: error.message});
+      dispatch({type: UPDATE_ERROR_CONTACT, message: error.message});
       setVisible(true);
       wait(2000).then(() => {
         setVisible(false);
       });
     } finally {
-      dispatch({type: POST_SUCCESS_CONTACT});
+      dispatch({type: UPDATE_SUCCESS_CONTACT});
     }
   };
 
@@ -135,9 +118,9 @@ export const DELETE_CONTACT =
   (id, navigation, setVisible) => async dispatch => {
     dispatch({type: DELETE_START_CONTACT});
     try {
-      const res = await axios.delete(`/contact/${id}`, {timeout: 8000});
-      console.log('DELETE', JSON.stringify(res.data, null, 2));
-      dispatch(GET_CONTACT());
+      await axios.delete(`/contact/${id}`, {timeout: 8000});
+      dispatch(GET_CONTACT(setVisible));
+      dispatch({type: DELETE_SUCCESS_CONTACT});
       setVisible(true);
       wait(2000).then(() => {
         setVisible(false);
@@ -147,14 +130,14 @@ export const DELETE_CONTACT =
       if (error.code === 'ECONNABORTED') {
         dispatch(addAlertTimeout());
       }
-      dispatch({type: DELETE_ERROR_CONTACT, message: error.message});
-      setVisible(true);
-      wait(2000).then(() => {
-        setVisible(false);
-        navigation.goBack();
-      });
-    } finally {
-      dispatch({type: DELETE_SUCCESS_CONTACT});
+      if (error) {
+        dispatch({type: DELETE_ERROR_CONTACT, message: error.message});
+        setVisible(true);
+        wait(2000).then(() => {
+          setVisible(false);
+          navigation.goBack();
+        });
+      }
     }
   };
 

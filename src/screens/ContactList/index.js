@@ -69,7 +69,7 @@ const ContactList = ({navigation}) => {
               <ActivityIndicator size={'large'} color={Colors.primary_dark} />
             </Content>
           ) : (
-            <Contact data={list} navigation={navigation} />
+            <Contact dispatch={dispatch} data={list} navigation={navigation} />
           )}
         </Content>
       </Content>

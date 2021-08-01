@@ -29,6 +29,7 @@ const TextInput = props => {
                         onPress={() =>
                           props.photoName && onChange(props.photoName)
                         }
+                        disabled
                         iconName="file-upload"
                         iconSize={24}
                         iconColor={Colors.placeholder}
@@ -64,6 +65,7 @@ const TextInput = props => {
                   />
                 )}
                 {value !== '' &&
+                props.photoName !== '' &&
                 !props.dropdown &&
                 !props.password &&
                 !props.download &&

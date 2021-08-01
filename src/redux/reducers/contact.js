@@ -11,6 +11,9 @@ import {
   POST_ERROR_CONTACT,
   POST_START_CONTACT,
   POST_SUCCESS_CONTACT,
+  UPDATE_START_CONTACT,
+  UPDATE_SUCCESS_CONTACT,
+  UPDATE_ERROR_CONTACT,
 } from '../types';
 
 const initialState = {
@@ -27,12 +30,16 @@ const contact = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
+        message: '',
+        error: false,
       };
     case GET_SUCCESS_CONTACT:
       return {
         ...state,
         loading: false,
         list: [...action.payload],
+        message: '',
+        error: false,
       };
     case GET_ERROR_CONTACT:
       return {
@@ -46,12 +53,16 @@ const contact = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
+        message: '',
+        error: false,
       };
     case GET_SUCCESS_CONTACT_DETAIL:
       return {
         ...state,
         loading: false,
         detail: action.payload,
+        message: '',
+        error: false,
       };
     case GET_ERROR_CONTACT_DETAIL:
       return {
@@ -65,13 +76,38 @@ const contact = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
+        message: '',
+        error: false,
       };
     case POST_SUCCESS_CONTACT:
       return {
         ...state,
         loading: false,
+        message: '',
+        error: false,
       };
     case POST_ERROR_CONTACT:
+      return {
+        ...state,
+        loading: false,
+        message: action.message,
+        error: true,
+      };
+    case UPDATE_START_CONTACT:
+      return {
+        ...state,
+        loading: true,
+        message: '',
+        error: false,
+      };
+    case UPDATE_SUCCESS_CONTACT:
+      return {
+        ...state,
+        loading: false,
+        message: '',
+        error: false,
+      };
+    case UPDATE_ERROR_CONTACT:
       return {
         ...state,
         loading: false,
@@ -82,11 +118,15 @@ const contact = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
+        message: '',
+        error: false,
       };
     case DELETE_SUCCESS_CONTACT:
       return {
         ...state,
         loading: false,
+        message: '',
+        error: false,
       };
     case DELETE_ERROR_CONTACT:
       return {
