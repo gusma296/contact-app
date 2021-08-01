@@ -91,6 +91,7 @@ export const UPDATE_CONTACT =
       const res = await axios.put(`/contact/${id}`, body, {timeout: 8000});
       if (res.status === 201) {
         dispatch(GET_CONTACT_DETAIL(id, setVisible));
+        dispatch(GET_CONTACT(setVisible));
         reset({});
         setVisible(true);
         wait(2000).then(() => {
