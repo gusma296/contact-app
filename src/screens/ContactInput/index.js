@@ -107,22 +107,24 @@ const ContactInput = ({navigation, route}) => {
         } else if (response?.errorMessage) {
           console.log('error', response?.errorMessage);
         } else {
-          const fileName = 'IMAGE_' + new Date().getTime() + '.jpg';
-          setFile({
-            uri: `data:image/png;base64,${response?.assets[0].base64}`,
-            name: fileName,
-            type: 'Image',
-          });
-          setValue('photo', fileName);
-          reset(
-            {
-              firstName: getValues('firstName'),
-              lastName: getValues('lastName'),
-              age: getValues('age'),
-              photo: getValues('photo'),
-            },
-            {keepErrors: false},
-          );
+          if (response?.assets[0]) {
+            const fileName = 'IMAGE_' + new Date().getTime() + '.jpg';
+            setFile({
+              uri: `data:image/png;base64,${response?.assets[0].base64}`,
+              name: fileName,
+              type: 'Image',
+            });
+            setValue('photo', fileName);
+            reset(
+              {
+                firstName: getValues('firstName'),
+                lastName: getValues('lastName'),
+                age: getValues('age'),
+                photo: getValues('photo'),
+              },
+              {keepErrors: false},
+            );
+          }
         }
       },
     );
