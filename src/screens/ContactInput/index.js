@@ -98,7 +98,12 @@ const ContactInput = ({navigation, route}) => {
 
   const Gallery = React.useCallback(() => {
     launchImageLibrary(
-      {mediaType: 'photo', quality: 0.8, includeBase64: true},
+      {
+        mediaType: 'photo',
+        quality: 0.8,
+        includeBase64: true,
+        selectionLimit: 1,
+      },
       async response => {
         if (response?.errorCode) {
           console.log('Error Code');
